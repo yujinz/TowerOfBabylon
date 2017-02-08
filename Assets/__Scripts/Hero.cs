@@ -94,12 +94,12 @@ public class Hero : MonoBehaviour {
             if (HammerLeft && hammerExactLeft()) vel.y = jumpSpeed;
             if (!HammerLeft && hammerExactRight()) vel.y = jumpSpeed;
         }
-        else if (grounded && !isTakingOff && // is landing off
+        else if (grounded && !isTakingOff && HammerRigid.gameObject.transform.localPosition.y > -0.1 &&// is landing off
             HammerRigid.gameObject.layer == LayerMask.NameToLayer("HammerJump")) {
             vel = Vector3.zero; //no bounce
             HammerRigid.gameObject.layer = LayerMask.NameToLayer("Hammer");
-            if (!HammerLeft)  HammerRigid.AddForce(-Vector3.right * jumpForce, ForceMode.Impulse);
-            else              HammerRigid.AddForce(Vector3.right * jumpForce, ForceMode.Impulse);
+            if (!HammerLeft)  HammerRigid.AddForce(-Vector3.right * hitForce, ForceMode.Impulse);
+            else              HammerRigid.AddForce(Vector3.right * hitForce, ForceMode.Impulse);
         }        
 
         if (Mathf.Abs(vel.y) > 0.5f && hammerExactUp()) { //0.5f means !grounded
@@ -107,7 +107,10 @@ public class Hero : MonoBehaviour {
             HammerRigid.angularVelocity = Vector3.zero;
             HammerRigid.velocity = Vector3.zero;
             isTakingOff = false;
-        }        
+        }
+        else if (vel.y <= -0.5f) {
+            isTakingOff = false;
+        }
 
         bodyRigid.velocity = vel;
 
