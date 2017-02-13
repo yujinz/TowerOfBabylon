@@ -69,9 +69,13 @@ public class Hero : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        Vector3 checkLoc = feet.transform.position;// + Vector3.up * (feet.radius * 0.9f);
+        Vector3 checkLoc = feet.transform.position + Vector3.down * (feet.radius * 0.2f);
         grounded = (Physics.Raycast(checkLoc + groudCheckOffset, Vector3.down, feet.radius, groundPhysicsLayerMask))
                    || (Physics.Raycast(checkLoc - groudCheckOffset, Vector3.down, feet.radius, groundPhysicsLayerMask));
+
+        Debug.DrawLine(checkLoc + groudCheckOffset, checkLoc + groudCheckOffset - new Vector3(0, feet.radius, 0), Color.red, 1f);
+        Debug.DrawLine(checkLoc - groudCheckOffset, checkLoc - groudCheckOffset - new Vector3(0, feet.radius, 0), Color.red, 1f);
+
 
         Vector3 vel = bodyRigid.velocity;
 
