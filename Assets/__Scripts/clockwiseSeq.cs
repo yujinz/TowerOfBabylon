@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class clockwiseSeq : MonoBehaviour {
+public class ClockwiseSeq : MonoBehaviour {
     public bool ans = false;
-    public const int len = 6;
+    public const int len = 10;
     public int hitLen = 3;
     public int jumpLen = 6;
     public float dtMax = 0.1f;
@@ -20,6 +20,7 @@ public class clockwiseSeq : MonoBehaviour {
 	void Update () {
         int curr = getRightJQ();
         if (Hero.S.isTakingOff) curr = 0;
+        if (Hammer.S.isColliding) idx = 0;
         
         if (curr != 0) {
             //print("curr" + curr);
@@ -40,18 +41,18 @@ public class clockwiseSeq : MonoBehaviour {
                     if (idx <= hitLen) {
                         if (idx == hitLen) {
                             callHit();
-                            print("true");
-                            print(Time.time);
-                            //idx = 0;//----diff
+                            //print("true");
+                            //print(Time.time);
                         }
                     }
-                    else {
-                        if (idx == jumpLen) {
-                            print("Jump");
-                            print(Time.time);
+                    else if (idx == jumpLen) {
+                            //print("Jump");
+                            //print(Time.time);
                             callJump();
-                            idx = 0;
-                        }
+                        
+                    }
+                    else if (idx == len) {
+                        idx = 0;
                     }
                 }
                 else  idx = 0;
@@ -61,8 +62,8 @@ public class clockwiseSeq : MonoBehaviour {
         else   idx = 0;
     }
 
-     
-    int getRightJQ() {
+
+    public static int getRightJQ() {
         float x = Input.GetAxis("RightJoystickX");
         float y = Input.GetAxis("RightJoystickY");
         //Vector2 coord = new Vector2(x, y);

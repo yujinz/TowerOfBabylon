@@ -18,12 +18,8 @@ using UnityEngine;
 public class Hammer : MonoBehaviour {
     static public Hammer S;
 
-    public bool HammerLeft = true;
-    public int jumpForce = 5;
     Rigidbody rigid;
-    public Vector3 up;
-    public float dist;
-    public bool APressed = false;
+    public bool isColliding = false;
 
     void Awake() {
         S = this;
@@ -31,42 +27,63 @@ public class Hammer : MonoBehaviour {
 
     void Start() {
         rigid = GetComponent<Rigidbody>();
-        
     }
 
-    void Update() {
-        up = transform.up;
-        dist = Vector3.Distance(transform.up, Vector3.right);
-
-        if (Input.GetKeyDown(KeyCode.A)) {
-            this.gameObject.layer = LayerMask.NameToLayer("HammerJump");
-            APressed = true;
-            if (HammerLeft) {
-                rigid.AddForce(transform.up * jumpForce, ForceMode.Impulse);
-                HammerLeft = false;
-            }
-            else {
-                rigid.AddForce(-transform.up * jumpForce, ForceMode.Impulse);
-                HammerLeft = true;
-            }
-        }
-        else if (Input.GetKeyUp(KeyCode.A)) {
-            this.gameObject.layer = LayerMask.NameToLayer("Hammer");
-        }
-
-        if (APressed && Vector3.Distance(transform.up, Vector3.right) < 0.1f) {
-            transform.up = Vector3.right;
-            rigid.angularVelocity = Vector3.zero;
-            rigid.velocity = Vector3.zero;
-            //APressed = false;
-        }
-
-        
-
-
-        
-
+    void FixedUpdate() {
+        //Hero.S.shouldClimb = false;
     }
- 
-    
+
+    public GameObject lastTriggerGo = null;
+    void OnCollisionEnter(Collision collision) {
+        if (collision.gameObject.tag == "Enemy") {
+            if (Hero.S.isHammer) {
+                collision.gameObject.GetComponent<Monster>().Die();
+                ScreenShakeEffect.Shake(5, 1, 1);
+            }
+            return;
+        }
+
+        if (!hammerExactLeft() && !hammerExactRight()) isColliding = true;
+
+        //print(gameObject.transform.position.y);
+        if (collision.gameObject == lastTriggerGo) return;
+        if (transform.position.y <
+            collision.gameObject.transform.position.y + collision.collider.bounds.extents.y)
+            return;
+
+        lastTriggerGo = collision.gameObject;
+        if (Hero.S.grounded) return;
+
+        print("vel: " + rigid.velocity);
+        print(Hero.S.bodyRigid.velocity);
+        print(rigid.velocity.x - Hero.S.bodyRigid.velocity.x);
+        print("pos: " + transform.position);
+        print(Hero.S.transform.position);
+
+        if ((rigid.velocity.x - Hero.S.bodyRigid.velocity.x > 1
+            && transform.position.x > Hero.S.transform.position.x)
+            || (rigid.velocity.x - Hero.S.bodyRigid.velocity.x < -1
+            && transform.position.x < Hero.S.transform.position.x)) {
+        }
+
+        print("should climb");
+        Hero.S.shouldClimb = true;
+    }
+
+    void OnCollisionExit(Collision collision) {
+        isColliding = false;
+    }
+
+
+    public bool hammerExactLeft() {
+        return Vector3.Distance(rigid.gameObject.transform.up, Vector3.up) < 0.2f;
+    }
+
+    public bool hammerExactRight() {
+        return Vector3.Distance(rigid.gameObject.transform.up, -Vector3.up) < 0.2f;
+    }
+
+    public bool hammerExactUp() {
+        return Vector3.Distance(rigid.gameObject.transform.up, Vector3.right) < 0.2f;
+    }
 }
