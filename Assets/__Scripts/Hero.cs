@@ -235,6 +235,7 @@ public class Hero : MonoBehaviour {
     }
 
     void switchPropeller() {
+        if (Hammer.S.isColliding) return;
         propeller.SetActive(true);
         //HammerCollider.enabled = false;
         HammerMesh.enabled = false;

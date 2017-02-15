@@ -6,10 +6,13 @@ public class LevelManager : MonoBehaviour {
     //public Vector3 camOffset1 = new Vector3(0, 0, -15);
     //public Vector3 camOffset2 = new Vector3(15, 0, 0);
     //public Vector3 camYOffset = new Vector3(0, 2, 0);
-    public Vector3 speedH1 = new Vector3(4f, 0, 0);
+    public int startLv = 1;
+    //public Vector3 speedH1 = new Vector3(4f, 0, 0);
     public Vector3 speedH2 = new Vector3(0, 0, 4f);
-    public Quaternion rotation1 = Quaternion.Euler(0, 0, 0);
-    public Quaternion rotation2 = Quaternion.Euler(0, -90, 0);
+    public Vector3 rot1 = new Vector3(0,0,0);
+    public Vector3 rot2 = new Vector3(0, 90, 0);
+    Quaternion rotation1 = Quaternion.Euler(0, 0, 0);
+    Quaternion rotation2 = Quaternion.Euler(0, 90, 0);
 
     Bounds boundedBox;
 
@@ -21,6 +24,9 @@ public class LevelManager : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        rotation1.eulerAngles = rot1;
+        rotation2.eulerAngles = rot2;
+
         cam = GameObject.Find("Main Camera").GetComponent<CameraFollow>();
         heroObject = GameObject.Find("Hero").gameObject;
         hammerObject = GameObject.Find("HammerS").gameObject;
@@ -28,10 +34,13 @@ public class LevelManager : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
         prevFlag = flag;
 
-        if (boundedBox.Contains(Hero.S.transform.position))
+        print(Hero.S.transform.localPosition);
+        print(boundedBox);
+
+        if (boundedBox.Contains(Hero.S.transform.localPosition))
             flag = true;
         else
             flag = false;
@@ -48,32 +57,32 @@ public class LevelManager : MonoBehaviour {
         print("lv changing");
         cam.isLving = true;
         foreach (Monster mt in FindObjectsOfType<Monster>()) {
-            mt.enabled = false;
+            if (mt.lv == cam.level) mt.enabled = false;
         }
         heroObject.GetComponent<Hero>().enabled = false;
         RigidbodyConstraints noRot = RigidbodyConstraints.FreezeRotation;
         RigidbodyConstraints noPos = RigidbodyConstraints.FreezePosition;
         hammerObject.GetComponent<Rigidbody>().constraints = noRot | noPos;
 
-        if (cam.GetComponent<CameraFollow>().level == 1) { //from lv1
+        if (cam.GetComponent<CameraFollow>().level == startLv) { //from lv1
             Vector3 pos = Hero.S.transform.position;
             pos.x = 10.5f;
             heroObject.GetComponent<Rigidbody>().transform.position = pos;
 
-            heroObject.GetComponent<Rigidbody>().transform.rotation = rotation2;
+            heroObject.GetComponent<Rigidbody>().transform.rotation = Quaternion.Euler(0, -90, 0);
             heroObject.GetComponent<Rigidbody>().velocity = speedH2;
 
             heroObject.GetComponent<Rigidbody>().constraints = noRot | RigidbodyConstraints.FreezePositionX;
         }
-        else if (cam.GetComponent<CameraFollow>().level == 2) { //from lv1
+        else if (cam.GetComponent<CameraFollow>().level == startLv + 1) { //from lv1
             Vector3 pos = Hero.S.transform.position;
-            pos.z = -10.5f;
+            pos.x = -10.5f;
             heroObject.GetComponent<Rigidbody>().transform.position = pos;
 
-            heroObject.GetComponent<Rigidbody>().transform.rotation = rotation1;
-            heroObject.GetComponent<Rigidbody>().velocity = -speedH1;
+            heroObject.GetComponent<Rigidbody>().transform.rotation = Quaternion.Euler(0, 90, 0);
+            heroObject.GetComponent<Rigidbody>().velocity = speedH2;
 
-            heroObject.GetComponent<Rigidbody>().constraints = noRot | RigidbodyConstraints.FreezePositionZ;
+            heroObject.GetComponent<Rigidbody>().constraints = noRot | RigidbodyConstraints.FreezePositionX;
         }
     }
 
@@ -81,13 +90,13 @@ public class LevelManager : MonoBehaviour {
         print("leave changed");
         cam.isLving = false;
 
-        if (cam.level == 1) {
-            AllRotate.S.transform.rotation = Quaternion.Euler(0, 90, 0);
-            cam.level = 2;
+        if (cam.level == startLv) {
+            AllRotate.S.transform.rotation = rotation2;// Quaternion.Euler(0, 90, 0);
+            cam.level = startLv + 1;
         }
-        else if (cam.level == 2) {
-            cam.level = 1;
-            AllRotate.S.transform.rotation = Quaternion.Euler(0, 0, 0);
+        else if (cam.level == startLv + 1) {
+            cam.level = startLv;
+            AllRotate.S.transform.rotation = rotation1;// Quaternion.Euler(0, 0, 0);
         }
 
         heroObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
@@ -99,6 +108,10 @@ public class LevelManager : MonoBehaviour {
             RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezePositionZ;
 
         heroObject.GetComponent<Hero>().enabled = true;
+
+        foreach (Monster mt in FindObjectsOfType<Monster>()) {
+             if (mt.lv == cam.level) mt.enabled = true;
+        }
         /*
         Vector3 pos = Hero.S.transform.position;
         pos.x = 10.5f;

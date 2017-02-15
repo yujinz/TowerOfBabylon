@@ -31,10 +31,14 @@ public class CameraFollow : MonoBehaviour {
         p1 = poi.position + offset;
 
         // Linear Interpolation - Look it up in Appendix B - JB
-        p01 = (1 - easingU) * p0 + easingU * p1;
+        if (Mathf.Abs(p0.x - p1.x) > 15f)
+            p01 = p1;
+        else
+            p01 = (1 - easingU) * p0 + easingU * p1;
 
         p01.x = RoundToNearestPixel(p01.x, cam);
         p01.y = RoundToNearestPixel(p01.y, cam);
+        p01.z = RoundToNearestPixel(p01.z, cam);
 
         transform.position = p01;
 

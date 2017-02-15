@@ -20,7 +20,6 @@ public class ClockwiseSeq : MonoBehaviour {
 	void Update () {
         int curr = getRightJQ();
         if (Hero.S.isTakingOff) curr = 0;
-        if (Hammer.S.isColliding) idx = 0;
         
         if (curr != 0) {
             //print("curr" + curr);
