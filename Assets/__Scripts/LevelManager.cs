@@ -54,7 +54,7 @@ public class LevelManager : MonoBehaviour {
     }
 
     void FreezeHero() {
-        print("lv changing");
+        //print("lv changing");
         cam.isLving = true;
         foreach (Monster mt in FindObjectsOfType<Monster>()) {
             if (mt.lv == cam.level) mt.enabled = false;

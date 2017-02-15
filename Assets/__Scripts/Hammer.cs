@@ -66,9 +66,10 @@ public class Hammer : MonoBehaviour {
             && transform.position.x < Hero.S.transform.position.x)) {
         }*/
 
-        print("should climb");
+        //print("should climb");
         Hero.S.shouldClimb = true;
-        rigid.velocity = Vector3.zero;
+        ScreenShakeEffect.Shake(3, 1, 1);
+        //rigid.velocity = Vector3.zero; /////
     }
 
     void OnCollisionExit(Collision collision) {

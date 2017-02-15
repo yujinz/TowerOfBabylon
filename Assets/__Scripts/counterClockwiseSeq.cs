@@ -6,7 +6,7 @@ public class CounterClockwiseSeq : ClockwiseSeq {
     //static public CounterClockwiseSeq S;
 
     void Start() {
-       // S = this;
+       //S = this;
     }
 
     override public void setSeq(int num) {

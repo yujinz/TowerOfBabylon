@@ -18,6 +18,13 @@ public abstract class Monster : MonoBehaviour {
     public bool recovery = false;
     public bool markedDie = false;
     public float tileSize = 0.5f; // Default tile size.
+    public Transform startTrans;
+    public Vector3 startPos;
+
+    public void Awake() {
+        startTrans = transform;
+        startPos = transform.localPosition;
+    }
 
     public virtual void OnTriggerEnter(Collider other) {
         var go = other.gameObject;
@@ -95,6 +102,9 @@ public abstract class Monster : MonoBehaviour {
     }
 
     public void Revive() {
+        //transform.position = startTrans.position;
+        transform.localPosition = startPos;
+        transform.eulerAngles = startTrans.eulerAngles;
         GetComponent<BoxCollider>().enabled = true;
         GetComponent<MeshRenderer>().enabled = true;
         foreach (MeshRenderer mr in GetComponentsInChildren<MeshRenderer>()) {

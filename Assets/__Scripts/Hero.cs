@@ -98,7 +98,26 @@ public class Hero : MonoBehaviour {
             if (HammerLeft && hammerExactLeft()) vel.y = jumpSpeed;
             if (!HammerLeft && hammerExactRight()) vel.y = jumpSpeed;
         }
-        
+
+        if (grounded && !isTakingOff && needHammerCorrect) {
+            if (HammerRigid.gameObject.transform.localPosition.y >= 0) { // hammer is above ground
+                vel = Vector3.zero; //no bounce
+                switchHammer();
+                needHammerCorrect = false;
+            }
+
+            //put down hammer
+            if (HammerLeft) {
+                HammerRigid.AddForce(-Vector3.right * jumpForce, ForceMode.Impulse);
+                HammerLeft = false;
+                //print("left force" + Time.time);
+            }
+            else {
+                HammerRigid.AddForce(Vector3.right * jumpForce, ForceMode.Impulse);
+                HammerLeft = true;
+                //print("right force" + Time.time);
+            }
+        }
         //else if (grounded && !isTakingOff && HammerRigid.gameObject.transform.localPosition.y > 0.1)        
 
         if (Mathf.Abs(vel.y) > 0.5f && hammerExactUp() && ClockwiseSeq.getRightJQ() == 0) { //0.5f means !grounded
@@ -137,38 +156,24 @@ public class Hero : MonoBehaviour {
                 switchHammer();
             }
             else if (Input.GetAxis("Trigger") <= 0) {
+                //print(transform.position.y);
                 switchPropeller();
             }
         }
         else { //grounded           
-            if (Input.GetAxis("Trigger") > 0.2 && 
-                HammerRigid.gameObject.transform.localPosition.y < 0) {
+            if (Input.GetAxis("Trigger") > 0.2 &&
+                HammerRigid.gameObject.transform.localPosition.y < -0.1) {
+                //print(HammerRigid.gameObject.transform.localPosition.y);
                 switchPropeller();
+                HammerRigid.gameObject.layer = LayerMask.NameToLayer("HammerJump");
+                needHammerCorrect = true;
             }
-            if (!prevGrounded) {
+            else if (prevGrounded && Input.GetAxis("Trigger") <= 0 
+                && HammerRigid.gameObject.transform.localPosition.y > 0) {
                 switchHammer();
             }
         }
 
-        if (grounded && !isTakingOff && needHammerCorrect) {
-            if (HammerRigid.gameObject.transform.localPosition.y >= 0) { // hammer is above ground
-                vel = Vector3.zero; //no bounce
-                switchHammer();
-                needHammerCorrect = false;
-            }
-
-            //put down hammer
-            if (HammerLeft) {
-                HammerRigid.AddForce(-Vector3.right * jumpForce, ForceMode.Impulse);
-                HammerLeft = false;
-                //print("left force" + Time.time);
-            }
-            else {
-                HammerRigid.AddForce(Vector3.right * jumpForce, ForceMode.Impulse);
-                HammerLeft = true;
-                //print("right force" + Time.time);
-            }
-        }
         /*
         if (needSwitch && HammerRigid.gameObject.transform.localPosition.y > 0) { // hammer is above ground
             if(HammerRigid.gameObject.layer == LayerMask.NameToLayer("Hammer")) {
@@ -256,6 +261,7 @@ public class Hero : MonoBehaviour {
     }
 
     void switchHammer() {
+        if (isTakingOff) return;
         propeller.SetActive(false);
         //HammerCollider.enabled = true;
         HammerMesh.enabled = true;
@@ -274,7 +280,8 @@ public class Hero : MonoBehaviour {
     public void startJumpClockwise() {
         if (isTakingOff) return;
         if (Hammer.S.isColliding) return;
-        if (!hammerExactLeft() && !hammerExactRight()) return;
+        //print("should jump");
+        //if (!hammerExactLeft() && !hammerExactRight() && Hammer.S.isColliding) return;
 
         isTakingOff = true;
         switchPropeller();
@@ -286,7 +293,8 @@ public class Hero : MonoBehaviour {
     public void startJumpCounterClockwise() {
         if (isTakingOff) return;
         if (Hammer.S.isColliding) return;
-        if (!hammerExactLeft() && !hammerExactRight()) return;
+        //print("should jump");
+        //if (!hammerExactLeft() && !hammerExactRight() && Hammer.S.isColliding) return;
 
         isTakingOff = true;
         switchPropeller();
@@ -294,7 +302,7 @@ public class Hero : MonoBehaviour {
 
         HammerRigid.AddForce( - HammerRigid.gameObject.transform.up * jumpForce, ForceMode.Impulse);
     }
-
+    
     public bool hammerExactLeft() {
         return Vector3.Distance(HammerRigid.gameObject.transform.up, Vector3.up) < 0.2f;
     }

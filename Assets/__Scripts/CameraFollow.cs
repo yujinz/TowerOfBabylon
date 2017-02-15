@@ -16,11 +16,17 @@ public class CameraFollow : MonoBehaviour {
 
     void Awake() {
         S = this;
-
         cam = GetComponent<Camera>();
-
         // Initially position the camera exactly over the poi - JB
         transform.position = poi.position + offset;
+    }
+
+    void Update() {
+        if (Input.GetButton("XButton")) {
+            foreach (Monster mt in FindObjectsOfType<Monster>()) {
+                mt.enabled = false;
+            }
+        }
     }
 
     // Update is called once per frame - JB
