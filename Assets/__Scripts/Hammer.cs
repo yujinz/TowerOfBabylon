@@ -53,7 +53,7 @@ public class Hammer : MonoBehaviour {
 
         lastTriggerGo = collision.gameObject;
         if (Hero.S.grounded) return;
-
+        /*
         print("vel: " + rigid.velocity);
         print(Hero.S.bodyRigid.velocity);
         print(rigid.velocity.x - Hero.S.bodyRigid.velocity.x);
@@ -64,10 +64,11 @@ public class Hammer : MonoBehaviour {
             && transform.position.x > Hero.S.transform.position.x)
             || (rigid.velocity.x - Hero.S.bodyRigid.velocity.x < -1
             && transform.position.x < Hero.S.transform.position.x)) {
-        }
+        }*/
 
         print("should climb");
         Hero.S.shouldClimb = true;
+        rigid.velocity = Vector3.zero;
     }
 
     void OnCollisionExit(Collision collision) {

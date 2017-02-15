@@ -88,7 +88,8 @@ public class Hero : MonoBehaviour {
         if (!needHammerCorrect && vel.y < 0 && !prevGrounded) needHammerCorrect = true;
 
         if (shouldClimb) {
-            vel.y = jumpSpeed/1.2f;
+            vel.y = jumpSpeed/1f;
+            vel.x = speedX;
             shouldClimb = false;
             print("climb!");
         }
@@ -97,25 +98,7 @@ public class Hero : MonoBehaviour {
             if (HammerLeft && hammerExactLeft()) vel.y = jumpSpeed;
             if (!HammerLeft && hammerExactRight()) vel.y = jumpSpeed;
         }
-        else if (grounded && !isTakingOff && needHammerCorrect) {
-            if (HammerRigid.gameObject.transform.localPosition.y > 0.001) { // hammer is above ground
-                vel = Vector3.zero; //no bounce
-                switchHammer();
-                needHammerCorrect = false;
-            }
-
-            //put down hammer
-            if (HammerLeft) {
-                HammerRigid.AddForce(-Vector3.right * jumpForce, ForceMode.Impulse);
-                HammerLeft = false;
-                //print("left force" + Time.time);
-            }
-            else {
-                HammerRigid.AddForce(Vector3.right * jumpForce, ForceMode.Impulse);
-                HammerLeft = true;
-                //print("right force" + Time.time);
-            }
-        }
+        
         //else if (grounded && !isTakingOff && HammerRigid.gameObject.transform.localPosition.y > 0.1)        
 
         if (Mathf.Abs(vel.y) > 0.5f && hammerExactUp() && ClockwiseSeq.getRightJQ() == 0) { //0.5f means !grounded
@@ -148,12 +131,43 @@ public class Hero : MonoBehaviour {
         }
 
         //========= switch hammer/propeller =========
-        if (Input.GetAxis("Trigger") > 0.2 && !grounded &&
-            HammerRigid.gameObject.transform.localPosition.y > 0) {
-            switchHammer();
+        if (!grounded) {
+            if (Input.GetAxis("Trigger") > 0.2 && 
+                HammerRigid.gameObject.transform.localPosition.y > 0) {
+                switchHammer();
+            }
+            else if (Input.GetAxis("Trigger") <= 0) {
+                switchPropeller();
+            }
         }
-        else if (Input.GetAxis("Trigger") <= 0 && !grounded) {
-            switchPropeller();
+        else { //grounded           
+            if (Input.GetAxis("Trigger") > 0.2 && 
+                HammerRigid.gameObject.transform.localPosition.y < 0) {
+                switchPropeller();
+            }
+            if (!prevGrounded) {
+                switchHammer();
+            }
+        }
+
+        if (grounded && !isTakingOff && needHammerCorrect) {
+            if (HammerRigid.gameObject.transform.localPosition.y >= 0) { // hammer is above ground
+                vel = Vector3.zero; //no bounce
+                switchHammer();
+                needHammerCorrect = false;
+            }
+
+            //put down hammer
+            if (HammerLeft) {
+                HammerRigid.AddForce(-Vector3.right * jumpForce, ForceMode.Impulse);
+                HammerLeft = false;
+                //print("left force" + Time.time);
+            }
+            else {
+                HammerRigid.AddForce(Vector3.right * jumpForce, ForceMode.Impulse);
+                HammerLeft = true;
+                //print("right force" + Time.time);
+            }
         }
         /*
         if (needSwitch && HammerRigid.gameObject.transform.localPosition.y > 0) { // hammer is above ground
