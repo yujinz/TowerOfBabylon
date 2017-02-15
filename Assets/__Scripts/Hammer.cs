@@ -72,6 +72,7 @@ public class Hammer : MonoBehaviour {
 
     void OnCollisionExit(Collision collision) {
         isColliding = false;
+        //rigid.velocity = Vector3.zero;
     }
 
 

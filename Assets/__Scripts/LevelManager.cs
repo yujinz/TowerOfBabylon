@@ -37,8 +37,8 @@ public class LevelManager : MonoBehaviour {
 	void FixedUpdate () {
         prevFlag = flag;
 
-        print(Hero.S.transform.localPosition);
-        print(boundedBox);
+        //print(Hero.S.transform.localPosition);
+        //print(boundedBox);
 
         if (boundedBox.Contains(Hero.S.transform.localPosition))
             flag = true;

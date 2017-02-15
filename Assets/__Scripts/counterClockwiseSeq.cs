@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CounterClockwiseSeq : ClockwiseSeq {
+    //static public CounterClockwiseSeq S;
+
+    void Start() {
+       // S = this;
+    }
 
     override public void setSeq(int num) {
         for (int i=0; i< len; i++) {

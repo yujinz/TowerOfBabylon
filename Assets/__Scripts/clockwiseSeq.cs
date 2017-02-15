@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ClockwiseSeq : MonoBehaviour {
+    //static public ClockwiseSeq S;
+
     public bool ans = false;
     public const int len = 10;
     public int hitLen = 3;
@@ -12,8 +14,9 @@ public class ClockwiseSeq : MonoBehaviour {
     public int idx = 0;
     public float tStart;
     // Use this for initialization
-    void Start () {
+    void Awake () {
         tStart = Time.time;
+        //S = this;
 	}
 	
 	// Update is called once per frame

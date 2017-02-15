@@ -235,7 +235,6 @@ public class Hero : MonoBehaviour {
     }
 
     void switchPropeller() {
-        if (Hammer.S.isColliding) return;
         propeller.SetActive(true);
         //HammerCollider.enabled = false;
         HammerMesh.enabled = false;
@@ -260,6 +259,9 @@ public class Hero : MonoBehaviour {
 
     public void startJumpClockwise() {
         if (isTakingOff) return;
+        if (Hammer.S.isColliding) return;
+        if (!hammerExactLeft() && !hammerExactRight()) return;
+
         isTakingOff = true;
         switchPropeller();
         HammerRigid.gameObject.layer = LayerMask.NameToLayer("HammerJump");
@@ -269,6 +271,9 @@ public class Hero : MonoBehaviour {
 
     public void startJumpCounterClockwise() {
         if (isTakingOff) return;
+        if (Hammer.S.isColliding) return;
+        if (!hammerExactLeft() && !hammerExactRight()) return;
+
         isTakingOff = true;
         switchPropeller();
         HammerRigid.gameObject.layer = LayerMask.NameToLayer("HammerJump");
