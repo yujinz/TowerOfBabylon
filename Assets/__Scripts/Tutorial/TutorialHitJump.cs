@@ -13,7 +13,7 @@ public class TutorialHitJump : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-		if (count == 2 && Input.GetAxis("Trigger") > 0.2 && ClockwiseSeq.getRightJQ()!=0) {
+		if (count == 2 && Input.GetAxis("Trigger") > 0.2 && RotateSeq.getRightJQ()!=0) {
             Time.timeScale = 1f;
             text.SetActive(false);
             Destroy(this);

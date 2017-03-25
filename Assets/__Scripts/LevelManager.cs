@@ -3,42 +3,34 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class LevelManager : MonoBehaviour {
-    //public Vector3 camOffset1 = new Vector3(0, 0, -15);
-    //public Vector3 camOffset2 = new Vector3(15, 0, 0);
-    //public Vector3 camYOffset = new Vector3(0, 2, 0);
     public int startLv = 1;
-    //public Vector3 speedH1 = new Vector3(4f, 0, 0);
     public Vector3 speedH2 = new Vector3(0, 0, 4f);
     public Vector3 rot1 = new Vector3(0,0,0);
     public Vector3 rot2 = new Vector3(0, 90, 0);
     Quaternion rotation1 = Quaternion.Euler(0, 0, 0);
     Quaternion rotation2 = Quaternion.Euler(0, 90, 0);
-
-    Bounds boundedBox;
-
+    RigidbodyConstraints noRot = RigidbodyConstraints.FreezeRotation;
+    RigidbodyConstraints noPos = RigidbodyConstraints.FreezePosition;
+    
     public bool prevFlag = false;
     public bool flag = false;
 
-    GameObject heroObject, hammerObject;//, cam;
+    Bounds boundedBox;
+    GameObject heroObject, hammerObject;
     CameraFollow cam;
 
-    // Use this for initialization
     void Start () {
         rotation1.eulerAngles = rot1;
         rotation2.eulerAngles = rot2;
 
         cam = GameObject.Find("Main Camera").GetComponent<CameraFollow>();
         heroObject = GameObject.Find("Hero").gameObject;
-        hammerObject = GameObject.Find("HammerS").gameObject;
+        hammerObject = GameObject.Find("Hammer").gameObject;
         boundedBox = gameObject.GetComponent<BoxCollider>().bounds;
     }
 	
-	// Update is called once per frame
 	void FixedUpdate () {
         prevFlag = flag;
-
-        //print(Hero.S.transform.localPosition);
-        //print(boundedBox);
 
         if (boundedBox.Contains(Hero.S.transform.localPosition))
             flag = true;
@@ -48,9 +40,7 @@ public class LevelManager : MonoBehaviour {
         if (flag)
             FreezeHero();
         else if (prevFlag && !flag)
-            Invoke("ActivateHero", 0.2f);
-
-        //print(GameObject.Find("Hero").GetComponent<Rigidbody>().velocity);
+            Invoke("ActivateHero", 0.2f);        
     }
 
     void FreezeHero() {
@@ -60,29 +50,27 @@ public class LevelManager : MonoBehaviour {
             if (mt.lv == cam.level) mt.enabled = false;
         }
         heroObject.GetComponent<Hero>().enabled = false;
-        RigidbodyConstraints noRot = RigidbodyConstraints.FreezeRotation;
-        RigidbodyConstraints noPos = RigidbodyConstraints.FreezePosition;
+        Rigidbody heroRigid = heroObject.GetComponent<Rigidbody>();
+
         hammerObject.GetComponent<Rigidbody>().constraints = noRot | noPos;
 
-        if (cam.GetComponent<CameraFollow>().level == startLv) { //from lv1
+        if (cam.GetComponent<CameraFollow>().level == startLv) { 
             Vector3 pos = Hero.S.transform.position;
             pos.x = 10.5f;
-            heroObject.GetComponent<Rigidbody>().transform.position = pos;
+            heroRigid.transform.position = pos;
+            heroRigid.transform.rotation = Quaternion.Euler(0, -90, 0);
+            heroRigid.velocity = speedH2;
 
-            heroObject.GetComponent<Rigidbody>().transform.rotation = Quaternion.Euler(0, -90, 0);
-            heroObject.GetComponent<Rigidbody>().velocity = speedH2;
-
-            heroObject.GetComponent<Rigidbody>().constraints = noRot | RigidbodyConstraints.FreezePositionX;
+            heroRigid.constraints = noRot | RigidbodyConstraints.FreezePositionX;
         }
-        else if (cam.GetComponent<CameraFollow>().level == startLv + 1) { //from lv1
+        else if (cam.GetComponent<CameraFollow>().level == startLv + 1) { 
             Vector3 pos = Hero.S.transform.position;
             pos.x = -10.5f;
-            heroObject.GetComponent<Rigidbody>().transform.position = pos;
+            heroRigid.transform.position = pos;
+            heroRigid.transform.rotation = Quaternion.Euler(0, 90, 0);
+            heroRigid.velocity = speedH2;
 
-            heroObject.GetComponent<Rigidbody>().transform.rotation = Quaternion.Euler(0, 90, 0);
-            heroObject.GetComponent<Rigidbody>().velocity = speedH2;
-
-            heroObject.GetComponent<Rigidbody>().constraints = noRot | RigidbodyConstraints.FreezePositionX;
+            heroRigid.constraints = noRot | RigidbodyConstraints.FreezePositionX;
         }
     }
 
@@ -101,7 +89,6 @@ public class LevelManager : MonoBehaviour {
 
         heroObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
 
-        RigidbodyConstraints noRot = RigidbodyConstraints.FreezeRotation;
         heroObject.GetComponent<Rigidbody>().constraints = noRot | RigidbodyConstraints.FreezePositionZ;
 
         hammerObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX |

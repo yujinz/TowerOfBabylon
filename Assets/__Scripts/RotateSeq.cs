@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ClockwiseSeq : MonoBehaviour {
-    //static public ClockwiseSeq S;
-
+public class RotateSeq : MonoBehaviour {
     public bool ans = false;
     public const int len = 10;
     public int hitLen = 3;
@@ -13,14 +11,12 @@ public class ClockwiseSeq : MonoBehaviour {
     public int[] seq = new int[len];
     public int idx = 0;
     public float tStart;
-    // Use this for initialization
-    void Awake () {
+
+    virtual public void Awake () {
         tStart = Time.time;
-        //S = this;
 	}
-	
-	// Update is called once per frame
-	void Update () {
+
+    virtual public void Update () {
         int curr = getRightJQ();
         if (Hero.S.isTakingOff) curr = 0;
         if (Hammer.S.isColliding && idx > hitLen - 1) idx = 0;
@@ -37,20 +33,16 @@ public class ClockwiseSeq : MonoBehaviour {
             else if (curr == seq[idx - 1]) { }
             else if (curr == seq[idx]) {
                 float dt = Time.time - tStart;
-                tStart = Time.time; //----diff
+                tStart = Time.time; 
                 if (dt < dtMax) {
                     ++idx;
                     setHammerDir();
                     if (idx <= hitLen) {
                         if (idx == hitLen) {
                             callHit();
-                            //print("true");
-                            //print(Time.time);
                         }
                     }
                     else if (idx == jumpLen) {
-                            //print("Jump");
-                            //print(Time.time);
                             callJump();
                         
                     }
@@ -65,13 +57,9 @@ public class ClockwiseSeq : MonoBehaviour {
         else   idx = 0;
     }
 
-
     public static int getRightJQ() {
         float x = Input.GetAxis("RightJoystickX");
         float y = Input.GetAxis("RightJoystickY");
-        //Vector2 coord = new Vector2(x, y);
-        //print(coord);
-        //print(getQuadrant(x, y));
         return getQuadrant(x, y);
     }
 
@@ -98,23 +86,14 @@ public class ClockwiseSeq : MonoBehaviour {
     }
 
     virtual public void setSeq(int num) {
-        for (int i = 0; i < len; i++) {
-            seq[i] = num;
-            num--;
-            if (num == 0) num = 8;
-        }
     }
 
     virtual public void setHammerDir() {
-        Hero.S.HammerLeft = true;
     }
 
     virtual public void callHit() {
-        Hero.S.hitClockwise();
     }
 
     virtual public void callJump() {
-        Hero.S.startJumpClockwise();
     }
-
 }

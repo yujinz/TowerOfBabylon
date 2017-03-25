@@ -2,11 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum HammerLen {
-    L,
-    S
-}
-
 public enum Facing {
     L,
     R
@@ -15,16 +10,23 @@ public enum Facing {
 public class Hero : MonoBehaviour {
     static public Hero S;
 
-    public GameObject HammerS, HammerL, RodS, RodL;
+    public GameObject propeller;
+    public int hitForce = 30;
+    public int jumpForce = 50;
+    //public float hitRateS = 1f;
+    //public float hitRateL = 2f;
+    public float jumpSpeed = 10f;
+    public float speedX = 4f;
+    public Vector3 speedH = new Vector3(4f, 0, 0);
+
+    public bool ____;
+
+    //public GameObject HammerS, HammerL, RodS, RodL;
     public Rigidbody HammerRigid, bodyRigid, RodRigid;
     SphereCollider feet;
-    public Collider HammerCollider;
     public MeshRenderer HammerMesh;
-    public GameObject propeller;
-    //Material goldMat, redMat;
-
-
-    public HammerLen len;
+    //public Collider HammerCollider;
+    //public HammerLen len;
     public bool HammerLeft = true;
     public bool grounded = true;
     public bool prevGrounded = true;
@@ -35,33 +37,27 @@ public class Hero : MonoBehaviour {
     public bool isHammer = true;
     public bool shouldClimb = false;
     //public Vector3 up;
-    //public float dist;
-
-    public int hitForce = 30;
-    public int jumpForce = 50;
-    public float hitRateS = 1f;
-    public float hitRateL = 2f;
-    public float jumpSpeed = 10f;
-    public float speedX = 4f;
-    public Vector3 speedH = new Vector3(4f, 0, 0);
+    //public float dist;    
     Vector3 groudCheckOffset;
     LayerMask groundPhysicsLayerMask;
 
     void Awake() {
         S = this;
-    }
-
-    void Start () {
-        switchLenS();
-        switchHammer();
         bodyRigid = GetComponent<Rigidbody>();
+        HammerRigid = transform.Find("Hammer").GetComponent<Rigidbody>();
+        RodRigid = transform.Find("Rod").GetComponent<Rigidbody>();
+        HammerMesh = transform.Find("Hammer").GetComponent<MeshRenderer>();
 
-        Transform baseTrans = this.transform.Find("Feet");
+        Transform baseTrans = transform.Find("Feet");
         feet = baseTrans.GetComponent<SphereCollider>();
         groudCheckOffset = new Vector3(feet.radius * 0.4f, 0, 0);
         groundPhysicsLayerMask = LayerMask.GetMask("Ground");
     }
-		
+
+    void Start () {
+        //switchLenS();
+        switchHammer();
+    }		
 
     void FixedUpdate() {
         Vector3 checkLoc = feet.transform.position + Vector3.down * (feet.radius * 0.2f);
@@ -110,21 +106,18 @@ public class Hero : MonoBehaviour {
             if (HammerLeft) {
                 HammerRigid.AddForce(-Vector3.right * jumpForce, ForceMode.Impulse);
                 HammerLeft = false;
-                //print("left force" + Time.time);
             }
             else {
                 HammerRigid.AddForce(Vector3.right * jumpForce, ForceMode.Impulse);
                 HammerLeft = true;
-                //print("right force" + Time.time);
             }
         }
         //else if (grounded && !isTakingOff && HammerRigid.gameObject.transform.localPosition.y > 0.1)        
 
-        if (Mathf.Abs(vel.y) > 0.5f && hammerExactUp() && ClockwiseSeq.getRightJQ() == 0) { //0.5f means !grounded
+        if (Mathf.Abs(vel.y) > 0.5f && hammerExactUp() && RotateSeq.getRightJQ() == 0) { //0.5f means !grounded
             HammerRigid.gameObject.transform.up = Vector3.right;
             HammerRigid.angularVelocity = Vector3.zero;
             HammerRigid.velocity = Vector3.zero;
-            //HammerRigid.gameObject.layer = LayerMask.NameToLayer("Hammer");//////
             isTakingOff = false;
         }
         else if (vel.y <= -0.5f) {
@@ -135,14 +128,12 @@ public class Hero : MonoBehaviour {
 
         //========== hammer no bounce ==============
         if (!isTakingOff && HammerLeft && hammerExactRight()) {
-            //print("no bounce");
             HammerRigid.angularVelocity = Vector3.zero;
             HammerRigid.velocity = Vector3.zero;
             HammerLeft = false;
             RodRigid.gameObject.transform.eulerAngles = new Vector3(0, 0, -90);
         }
         if (!isTakingOff && !HammerLeft && hammerExactLeft()) {
-            //print("no bounce");
             HammerRigid.angularVelocity = Vector3.zero;
             HammerRigid.velocity = Vector3.zero;
             HammerLeft = true;
@@ -156,14 +147,12 @@ public class Hero : MonoBehaviour {
                 switchHammer();
             }
             else if (Input.GetAxis("Trigger") <= 0) {
-                //print(transform.position.y);
                 switchPropeller();
             }
         }
         else { //grounded           
             if (Input.GetAxis("Trigger") > 0.2 &&
                 HammerRigid.gameObject.transform.localPosition.y < -0.1) {
-                //print(HammerRigid.gameObject.transform.localPosition.y);
                 switchPropeller();
                 HammerRigid.gameObject.layer = LayerMask.NameToLayer("HammerJump");
                 needHammerCorrect = true;
@@ -173,33 +162,77 @@ public class Hero : MonoBehaviour {
                 switchHammer();
             }
         }
-
-        /*
-        if (needSwitch && HammerRigid.gameObject.transform.localPosition.y > 0) { // hammer is above ground
-            if(HammerRigid.gameObject.layer == LayerMask.NameToLayer("Hammer")) {
-                switchPropeller();
-            }
-            else if (HammerRigid.gameObject.layer == LayerMask.NameToLayer("HammerJump")) {
-                switchHammer();
-            }
-            switched = true;
-            needSwitch = false;
-
-            */
-        /*
-        if (Input.GetAxis("Trigger") < -0.2) {
-            switchPropeller();
-        }
-        else if (Input.GetAxis("Trigger") > 0.2) {
-            switchHammer();
-        }
-    }*/
-
-        //print(grounded);
-        //print(vel.y);
-
     }
-    /*
+    void switchPropeller() {
+        propeller.SetActive(true);
+        //HammerCollider.enabled = false;
+        HammerMesh.enabled = false;
+        isHammer = false;
+    }
+
+    void switchHammer() {
+        if (isTakingOff) return;
+        propeller.SetActive(false);
+        //HammerCollider.enabled = true;
+        HammerMesh.enabled = true;
+        HammerRigid.gameObject.layer = LayerMask.NameToLayer("Hammer");
+        isHammer = true;
+    }
+
+    public void hitClockwise() {
+        HammerRigid.AddForce(HammerRigid.gameObject.transform.up * hitForce, ForceMode.Impulse);
+    }
+
+    public void hitCounterClockwise() {
+        HammerRigid.AddForce(-HammerRigid.gameObject.transform.up * hitForce, ForceMode.Impulse);
+    }
+
+    public void startJumpClockwise() {
+        if (!checkAndSetJump()) return;
+        HammerRigid.AddForce(HammerRigid.gameObject.transform.up * jumpForce, ForceMode.Impulse);
+    }
+
+    public void startJumpCounterClockwise() {
+        if (!checkAndSetJump()) return;
+        HammerRigid.AddForce( - HammerRigid.gameObject.transform.up * jumpForce, ForceMode.Impulse);
+    }
+
+    public bool checkAndSetJump() {
+        if (isTakingOff) return false;
+        if (Hammer.S.isColliding) return false;
+
+        isTakingOff = true;
+        switchPropeller();
+        HammerRigid.gameObject.layer = LayerMask.NameToLayer("HammerJump");
+        return true;
+    }
+    
+    public bool hammerExactLeft() {
+        return Vector3.Distance(HammerRigid.gameObject.transform.up, Vector3.up) < 0.2f;
+    }
+
+    public bool hammerExactRight() {
+        return Vector3.Distance(HammerRigid.gameObject.transform.up, -Vector3.up) < 0.2f;
+    }
+
+    public bool hammerExactUp() {
+        return Vector3.Distance(HammerRigid.gameObject.transform.up, Vector3.right) < 0.2f;
+    }
+
+    int getLeftJQ() {
+        float x = Input.GetAxis("LeftJoystickX");
+        float y = Input.GetAxis("LeftJoystickY");
+        return ClockwiseSeq.getQuadrant(x, y);
+    }
+
+
+    /* ================== Future feature: different length of hammer ================
+    
+    public enum HammerLen {
+        L,
+        S
+    }
+
     void Update () {
         
         if (Input.GetKeyDown(KeyCode.S)) {
@@ -232,7 +265,6 @@ public class Hero : MonoBehaviour {
             yield return new WaitForSeconds(period);
         }
     }
-    */
     void switchLenS() {
         len = HammerLen.S;
         HammerRigid = HammerS.GetComponent<Rigidbody>();
@@ -252,74 +284,8 @@ public class Hero : MonoBehaviour {
         HammerS.SetActive(false);
         RodS.SetActive(false);
     }
+    */
 
-    void switchPropeller() {
-        propeller.SetActive(true);
-        //HammerCollider.enabled = false;
-        HammerMesh.enabled = false;
-        isHammer = false;
-    }
-
-    void switchHammer() {
-        if (isTakingOff) return;
-        propeller.SetActive(false);
-        //HammerCollider.enabled = true;
-        HammerMesh.enabled = true;
-        HammerRigid.gameObject.layer = LayerMask.NameToLayer("Hammer");
-        isHammer = true;
-    }
-
-    public void hitClockwise() {
-        HammerRigid.AddForce(HammerRigid.gameObject.transform.up * hitForce, ForceMode.Impulse);
-    }
-
-    public void hitCounterClockwise() {
-        HammerRigid.AddForce(-HammerRigid.gameObject.transform.up * hitForce, ForceMode.Impulse);
-    }
-
-    public void startJumpClockwise() {
-        if (isTakingOff) return;
-        if (Hammer.S.isColliding) return;
-        //print("should jump");
-        //if (!hammerExactLeft() && !hammerExactRight() && Hammer.S.isColliding) return;
-
-        isTakingOff = true;
-        switchPropeller();
-        HammerRigid.gameObject.layer = LayerMask.NameToLayer("HammerJump");
-
-        HammerRigid.AddForce(HammerRigid.gameObject.transform.up * jumpForce, ForceMode.Impulse);
-    }
-
-    public void startJumpCounterClockwise() {
-        if (isTakingOff) return;
-        if (Hammer.S.isColliding) return;
-        //print("should jump");
-        //if (!hammerExactLeft() && !hammerExactRight() && Hammer.S.isColliding) return;
-
-        isTakingOff = true;
-        switchPropeller();
-        HammerRigid.gameObject.layer = LayerMask.NameToLayer("HammerJump");
-
-        HammerRigid.AddForce( - HammerRigid.gameObject.transform.up * jumpForce, ForceMode.Impulse);
-    }
-    
-    public bool hammerExactLeft() {
-        return Vector3.Distance(HammerRigid.gameObject.transform.up, Vector3.up) < 0.2f;
-    }
-
-    public bool hammerExactRight() {
-        return Vector3.Distance(HammerRigid.gameObject.transform.up, -Vector3.up) < 0.2f;
-    }
-
-    public bool hammerExactUp() {
-        return Vector3.Distance(HammerRigid.gameObject.transform.up, Vector3.right) < 0.2f;
-    }
-
-    int getLeftJQ() {
-        float x = Input.GetAxis("LeftJoystickX");
-        float y = Input.GetAxis("LeftJoystickY");
-        return ClockwiseSeq.getQuadrant(x, y);
-    }
 }
 
 

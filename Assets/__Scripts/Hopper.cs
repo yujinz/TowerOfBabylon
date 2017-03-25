@@ -12,14 +12,12 @@ public class Hopper : Monster {
     public float nextChangeTime;
     Rigidbody rigid;
 
-    // Use this for initialization
     void Start () {
         direction = Vector3.zero;
         nextChangeTime = Time.time;
         rigid = GetComponent<Rigidbody>();
     }
 	
-	// Update is called once per frame
 	void Update () {
         if (transform.position == startPos) {
             direction = Vector3.zero;
@@ -58,15 +56,5 @@ public class Hopper : Monster {
 
     public void FixedUpdate() {
         transform.position += speedX * direction;
-    }
-
-    public override void HurtByBullet() {
-        print("hurt by bullet");
-        health -= 1;
-    }
-
-    public override void HurtByMissle() {
-        print("hurt by missle");
-        health -= 4;
     }
 }

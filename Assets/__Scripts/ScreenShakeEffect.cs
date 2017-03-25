@@ -1,4 +1,4 @@
-﻿/* A component that implements (and provides an API for) a screen-shake effect */
+﻿/* An API for screen-shake effect */
 // Requires placement on a camera gameobject.
 
 using System.Collections;
@@ -22,7 +22,6 @@ public class ScreenShakeEffect : MonoBehaviour {
         S.shake_speed = speed;
     }
 
-    // Use this for initialization
     void Start () {
         if (S != null && S != this)
         {
@@ -33,7 +32,6 @@ public class ScreenShakeEffect : MonoBehaviour {
             S = this;
     }
     
-    // Update is called once per frame
     void Update () {
         if(shake_timer > 0)
         {

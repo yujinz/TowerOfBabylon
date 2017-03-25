@@ -13,7 +13,7 @@ public class TutorialEnemy : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-		if (count == 2 && ClockwiseSeq.getRightJQ()!=0) {
+		if (count == 2 && RotateSeq.getRightJQ()!=0) {
             Time.timeScale = 1f;
             text.SetActive(false);
             Destroy(this);

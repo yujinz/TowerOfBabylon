@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿// Same behaviour as the Zoomer in Metroid NES
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -101,31 +103,11 @@ public class Zoomer : Monster {
         } else {
             TryAttach();
         }
-        /*
-        if (LevelManager.S.showDoor) {
-            Vector3 pos = cam.WorldToViewportPoint(transform.position) - new Vector3(0.5f, 0.5f, 0);
-            if (Mathf.Abs(pos.x)>=0.48f || Mathf.Abs(pos.y)>=0.48f) {
-                orientation = -orientation;
-                clockwise = !clockwise;
-            }
-        }
-        */
     }
 
     public void FixedUpdate() {
         if ((int)Time.time % 2 == 0) return;
         if (!recovery)
             transform.position += orientation*speed;
-    }
-
-    public override void HurtByBullet() {
-        print("hurt by bullet");
-        health -= 1;
-    }
-
-    public override void HurtByMissle() {
-        print("hurt by missle");
-        health -= 4;
-    }
-
+    }    
 }
